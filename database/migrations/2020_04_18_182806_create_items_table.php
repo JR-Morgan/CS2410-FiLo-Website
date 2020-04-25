@@ -15,7 +15,7 @@ class CreateItemsTable extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->id();
-            $table->enum('category',config('enums.itemCategory'))->default('other');
+            $table->enum('category', config('enums.itemCategory'))->default('other');
             $table->date('found_time');
             $table->bigInteger('found_userid')->unsigned();
             $table->string('found_location', 256);

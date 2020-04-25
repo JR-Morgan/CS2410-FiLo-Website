@@ -29,16 +29,22 @@
                         </tr>
                         <tr>
                             <td colspan='2' >
-                                <img style="width:100%;height:100%" src="{{asset('storage/'.$item->image)}}">
+                                <img style="width:100%;height:100%" src="{{asset('storage/images/'.$item->image)}}">
                             </td>
                         </tr>
                     </table>
                     <table>
                         <tr>
                             <td><a href="{{route('items.index')}}" class="btn btn-primary" role="button">Back to the list</a></td>
+
+                            @can('itemRequestCreate', App\Item::find($item['id']))
+                                <td><a href="{{action('ItemRequestController@create', array('itemId' => $item['id']))}}" class="btn btn-success">Request</a></td>
+                            @endcan
+
                             @can('itemEdit', App\Item::find($item['id']))
                                 <td><a href="{{action('ItemController@edit', $item['id'])}}" class="btn btn-warning">Edit</a></td>
                             @endcan
+
                             <td>
                                 @can('itemDelete', App\Item::find($item['id']))
                                     <form action="{{action('ItemController@destroy', $item['id'])}}" method="post">

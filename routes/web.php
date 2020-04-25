@@ -22,3 +22,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::resource('items','ItemController');
+
+Route::resource('itemrequests','ItemRequestController');
+Route::get('itemrequests/{id}/approve', 'ItemRequestController@approve');
+Route::get('itemrequests/{id}/reject', 'ItemRequestController@reject');

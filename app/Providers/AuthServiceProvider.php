@@ -5,6 +5,9 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Response;
+use App\Item;
+use App\User;
+use App\ItemRequest;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -31,6 +34,7 @@ class AuthServiceProvider extends ServiceProvider
 
     public function registerPolicies()
     {
+        //Admin has all privilages
         Gate::before(function ($user)
         {
             if($user->role)
@@ -39,21 +43,43 @@ class AuthServiceProvider extends ServiceProvider
             }
         });
 
-        Gate::define('itemShowDetails', function ($user)
+        //Item
+        Gate::define('itemShowDetails', function (User $user)
         {
             return $user;
         });
-        Gate::define('itemCreate', function ($user)
+        Gate::define('itemCreate', function (User $user)
         {
             return $user;
         });
-        Gate::define('itemEdit', function ($user, $item)
+        Gate::define('itemEdit', function (User $user, Item $item)
         {
             return $item->found_userid == $user->id;
         });
-        Gate::define('itemDelete', function ($user, $item)
+        Gate::define('itemDelete', function (User $user, Item $item)
         {
             return $item->found_userid == $user->id;
+        });
+        //Requests
+        Gate::define('itemRequestDelete', function (User $user, ItemRequest $itemRequest)
+        {
+            return $item->userid == $user->id;
+        });
+        Gate::define('itemRequestView', function (User $user, ItemRequest $itemRequest)
+        {
+            return $item->userid == $user->id;
+        });
+        Gate::define('itemRequestEdit', function (User $user, ItemRequest $itemRequest)
+        {
+            return $item->userid == $user->id;
+        });
+        Gate::define('itemRequestCreate', function (User $user, Item $item)
+        {
+            return $user;
+        });
+        Gate::define('itemRequestViewAll', function (User $user)
+        {
+            return false;
         });
     }
 }

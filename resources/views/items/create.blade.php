@@ -27,43 +27,44 @@
                 @endif
                 <!--define the form -->
                 <div class="card-body">
-                    <form class="form-horizontal" method="POST" action="{{url('items')}}"enctype="multipart/form-data">
+                    <form class="form-horizontal" method="POST" action="{{url('items')}}" enctype="multipart/form-data">
                         @csrf
                         <div class="row" style="text-align:right;">
-                            <div class="row col-md-8">
-                                <label class="col-md-6">Category</label>
-                                <select class="col-md-6" name="category">
+
+                            <div class="row col-md-10">
+                                <label class="col-md-5">Category</label>
+                                <select class="col-md-7" name="category">
                                 @foreach(config('enums.itemCategory') as $value)
                                     <option value="{{$value}}">{{ucfirst($value)}}</option>
                                 @endforeach
                                 </select>
                             </div>
-                            <div class="row col-md-8">
-                                <label class="col-md-6">Time Found</label>
-                                <input class="col-md-6" type="date" name="found_time" required/>
+                            <div class="row col-md-10">
+                                <label class="col-md-5">Time Found</label>
+                                <input class="col-md-7" type="date" name="found_time" required/>
                             </div>
-                            <div class="row col-md-8">
-                                <label class="col-md-6">Location found</label>
-                                <input class="col-md-6" type="text" name="found_location" required/>
+                            <div class="row col-md-10">
+                                <label class="col-md-5">Location found</label>
+                                <input class="col-md-7" type="text" name="found_location" required/>
                             </div>
-                            <div class="row col-md-8">
-                                <label class="col-md-6">Color</label>
-                                <select class="col-md-6" name="color">
+                            <div class="row col-md-10">
+                                <label class="col-md-5">Color</label>
+                                <select class="col-md-7" name="color">
                                 @foreach(config('enums.itemColor') as $value)
                                     <option value="{{$value}}">{{ucfirst($value)}}</option>
                                 @endforeach
                                 </select>
                             </div>
-                            <div class="row col-md-8">
-                                <label class="col-md-6">Description</label>
-                                <textarea class="col-md-6" rows="4" cols="50" name="description"> </textarea>
+                            <div class="row col-md-10">
+                                <label class="col-md-5">Description</label>
+                                <textarea class="col-md-7" rows="4" cols="50" name="description"> </textarea>
                             </div>
-                            <div class="row col-md-8">
-                                <label class="col-md-6">Image</label>
-                                <input class="col-md-6" type="file" name="image" placeholder="Image file" />
+                            <div class="row col-md-10">
+                                <label class="col-md-5">Image</label>
+                                <input class="col-md-7" type="file" name="image" placeholder="Image file" />
                             </div>
-                            </div
-                        <div class="col-md-6 col-md-offset-4">
+                        </div>
+                        <div class="col-md-7 col-md-offset-4">
                             <input type="submit" class="btn btn-primary" />
                             <input type="reset" class="btn btn-primary" />
                         </div>

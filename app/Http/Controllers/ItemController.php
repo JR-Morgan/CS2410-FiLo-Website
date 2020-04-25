@@ -67,7 +67,7 @@ class ItemController extends Controller
         {
             $fileNameToStore = 'noimage.jpg';
         }
-        // create a Vehicle object and set its values from the input
+
         $item = new Item;
         $item->category = $request->input('category');
         $item->found_userid = auth()->user()->id;;
@@ -78,7 +78,7 @@ class ItemController extends Controller
         $item->description = $request->input('description');
         $item->created_at = now();
 
-        // save the Vehicle object
+
         $item->save();
         // generate a redirect HTTP response with a success message
         return back()->with('success', 'Item has been added');
@@ -93,6 +93,10 @@ class ItemController extends Controller
     public function show($id)
     {
         $item = Item::find($id);
+        if(!$item)
+        {
+            abort(404);
+        }
         Gate::authorize('itemShowDetails', $item);
         return view('items.show',compact('item'));
     }
@@ -103,11 +107,11 @@ class ItemController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(int $id)
     {
         $item = Item::find($id);
         Gate::authorize('itemEdit', $item);
-        return view('items.edit',compact('item'));
+        return view('items.edit', compact('item'));
     }
 
     /**
@@ -166,11 +170,12 @@ class ItemController extends Controller
      */
     public function destroy($id)
     {
-        $item = Item::find($id);$item->delete();
+        $item = Item::find($id);
         if(Gate::denies('itemDelete', $item))
         {
             return back()->withErrors(['Missing a required permission to delete this item']);
         }
+        $item->delete();
         return redirect('items')->with('success','Item has been deleted');
     }
 }

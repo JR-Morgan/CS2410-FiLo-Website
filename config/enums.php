@@ -4,7 +4,6 @@ return
     'itemColor' =>
     [
         'none',
-        'clear',
         'black',
         'white',
         'grey',
@@ -13,7 +12,7 @@ return
         'brown',
         'yellow',
         'green',
-        'light blue',
+        'cyan',
         'blue',
         'purple',
         'magenta',
@@ -25,5 +24,12 @@ return
         'pet',
         'phone',
         'jewellery',
+    ],
+
+    'itemRequestStates' =>
+    [
+        'open',
+        'approved',
+        'rejected',
     ],
 ];
