@@ -18,7 +18,7 @@ class ItemRequestController extends Controller
     public function index()
     {
         Gate::authorize('itemRequestViewAll');
-        $itemRequests = ItemRequest::all()->toArray();
+        $itemRequests = ItemRequest::all();
         return view('itemRequests.index', compact('itemRequests'));
     }
 
@@ -88,8 +88,8 @@ class ItemRequestController extends Controller
 
         if(!$itemRequest)
         {
-            $lable = $itemRequestId ? $itemRequestId : 'null';
-            abort(400, "Cannot process request: ItemRequest \"{$lable}\" was not found");
+            $label = $itemRequestId ? $itemRequestId : 'null';
+            abort(400, "Cannot process request: ItemRequest \"{$label}\" was not found");
         }
         else if (! in_array($state, config('enums.itemRequestStates')))
         {

@@ -16,8 +16,8 @@ class CreateItemRequestsTable extends Migration
         Schema::create('item_requests', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('message', 256)->nullable();
-            $table->enum('state', config('enums.itemRequestStates'))->default('open');;
+            $table->string('message', 512)->nullable();
+            $table->enum('state', config('enums.itemRequestStates'))->default('open');
             $table->foreignId('item_id')->constrained('items');
             $table->foreignId('claim_userid')->constrained('users');
         });

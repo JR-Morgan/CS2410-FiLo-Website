@@ -30,7 +30,10 @@
                     <form class="form-horizontal" method="POST" action="{{url('items')}}" enctype="multipart/form-data">
                         @csrf
                         <div class="row" style="text-align:right;">
-
+                            <div class="row col-md-10">
+                                <label class="col-md-5">Title</label>
+                                <input class="col-md-7" type="text" name="title" maxlength="64" required/>
+                            </div>
                             <div class="row col-md-10">
                                 <label class="col-md-5">Category</label>
                                 <select class="col-md-7" name="category">
@@ -45,7 +48,7 @@
                             </div>
                             <div class="row col-md-10">
                                 <label class="col-md-5">Location found</label>
-                                <input class="col-md-7" type="text" name="found_location" required/>
+                                <input class="col-md-7" type="text" name="found_location" maxlength="128" required/>
                             </div>
                             <div class="row col-md-10">
                                 <label class="col-md-5">Color</label>
@@ -57,7 +60,7 @@
                             </div>
                             <div class="row col-md-10">
                                 <label class="col-md-5">Description</label>
-                                <textarea class="col-md-7" rows="4" cols="50" name="description"> </textarea>
+                                <textarea class="col-md-7" rows="4" cols="50" name="description" maxlength="256"></textarea>
                             </div>
                             <div class="row col-md-10">
                                 <label class="col-md-5">Image</label>

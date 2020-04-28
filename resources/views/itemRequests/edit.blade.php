@@ -27,9 +27,10 @@
                         @csrf
                         <div class="row col-md-8">
                             <label class="col-md-6">Message</label>
-                            <textarea rows="4" cols="50" name="message" class="col-md-6"> </textarea>
+                            <textarea rows="4" cols="50" name="message" maxlength="512" class="col-md-6"> </textarea>
                         </div>
-                        <div class="col-md-6 col-md-offset-4">
+                        <div class="col-md-12 col-md-offset-4">
+                            <a href="{{action('ItemRequestController@show', $itemRequest['id'])}}" class="btn btn-secondary" role="button">Back to request</a>
                             <input type="submit" class="btn btn-primary" />
                             <input type="reset" class="btn btn-primary" />
                         </div>

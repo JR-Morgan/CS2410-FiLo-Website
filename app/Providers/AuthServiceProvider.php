@@ -65,13 +65,14 @@ class AuthServiceProvider extends ServiceProvider
         {
             return $item->userid == $user->id;
         });
-        Gate::define('itemRequestView', function (User $user, ItemRequest $itemRequest)
+        Gate::define('itemRequestShow', function (User $user, ItemRequest $itemRequest)
         {
-            return $item->userid == $user->id;
+            //abort(400, "{$itemRequest} == {$user}");
+            return $itemRequest->claim_userid == $user->id;
         });
         Gate::define('itemRequestEdit', function (User $user, ItemRequest $itemRequest)
         {
-            return $item->userid == $user->id;
+            return $itemRequest->claim_userid == $user->id;
         });
         Gate::define('itemRequestCreate', function (User $user, Item $item)
         {

@@ -4,12 +4,12 @@
     <div class="row justify-content-center">
         <div class="col-md-8 ">
             <div class="card">
-                <div class="card-header">Display all item requests</div>
+                <div class="card-header">Item request {{$itemRequest->id}} details</div>
                 <div class="card-body">
                     <table class="table table-striped" border="1" >
                         <tr>
                             <th>Item</th>
-                            <td>{{$itemRequest->item_id}}</td>
+                            <td><a href="{{action('ItemController@show', $itemRequest['item_id'])}}">{{$itemRequest->item_id}}</a></td>
                         </tr>
                         <tr>
                             <th>User</th>
@@ -34,19 +34,12 @@
                     </table>
                     <table>
                         <tr>
-                            <td><a href="{{action('ItemRequestController@index', $itemRequest['id'])}}" class="btn btn-primary" role="button">Back to the list</a></td>
+                            @can('itemRequestViewAll')
+                                <td><a href="{{action('ItemRequestController@index', $itemRequest['id'])}}" class="btn btn-secondary" role="button">Back to the list</a></td>
+                            @endcan
                             @can('itemRequestEdit', App\ItemRequest::find($itemRequest['id']))
                                 <td><a href="{{action('ItemRequestController@edit', $itemRequest['id'])}}" class="btn btn-warning">Edit</a></td>
                             @endcan
-                            <td>
-                                @can('itemRequestDelete', App\ItemRequest::find($itemRequest['id']))
-                                    <form action="{{action('ItemRequestController@destroy', $itemRequest['id'])}}" method="post">
-                                        @csrf
-                                        <input name="_method" type="hidden" value="DELETE">
-                                        <button class="btn btn-danger" type="submit">Delete</button>
-                                    </form>
-                                @endcan
-                            </td>
                         </tr>
                     </table>
                 </div>

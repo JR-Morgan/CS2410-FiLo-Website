@@ -4,16 +4,20 @@
     <div class="row justify-content-center">
         <div class="col-md-8 ">
             <div class="card">
-                <div class="card-header">Display all items</div>
+                <div class="card-header">Item {{$item->id}} details</div>
                 <div class="card-body">
                     <table class="table table-striped" border="1" >
                         <tr>
+                            <th>Title</th>
+                            <td>{{ucfirst($item->title)}}</td>
+                        </tr>
+                        <tr>
                             <th>Item category</th>
-                            <td>{{$item->category}}</td>
+                            <td>{{ucfirst($item->category)}}</td>
                         </tr>
                         <tr>
                             <th>Item colour</th>
-                            <td>{{$item->color}}</td>
+                            <td>{{ucfirst($item->color)}}</td>
                         </tr>
                         <tr>
                             <th>Location found</th>
@@ -35,7 +39,7 @@
                     </table>
                     <table>
                         <tr>
-                            <td><a href="{{route('items.index')}}" class="btn btn-primary" role="button">Back to the list</a></td>
+                            <td><a href="{{route('items.index')}}" class="btn btn-secondary" role="button">Back to the list</a></td>
 
                             @can('itemRequestCreate', App\Item::find($item['id']))
                                 <td><a href="{{action('ItemRequestController@create', array('itemId' => $item['id']))}}" class="btn btn-success">Request</a></td>

@@ -3,80 +3,108 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\ItemCreateRequest;
+use App\Http\Requests\ItemUpdateRequest;
+use Illuminate\Validation\Rule;
 use App\Item;
 use Auth;
 use Gate;
 
 class ItemController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+
+    public function index(Request $request)
     {
-        $items = Item::all()->toArray();
-        return view('items.index', compact('items'));
+        $items = collect();
+        $allItems = Item::all();
+        $filterColumns = ['category', 'color'];
+        $searchString = $request->input("searchString");
+
+        foreach($allItems as $item)
+        {
+            $passesFilter = true;
+            if($request->input("filter"))
+            {
+                foreach($filterColumns as $filterColumn)
+                {
+                    $passesFilter = $passesFilter && $request->input("{$filterColumn}_{$item->$filterColumn}");
+                }
+            }
+
+            if($passesFilter
+            &&(!$searchString || preg_match("/{$searchString}/i", $item->title)))
+            {
+                $items->push($item);
+            }
+        }
+
+        $activeFilters = array();
+        foreach($filterColumns as $filterColumn)
+        {
+            $activeFilters["{$filterColumn}"] = [];
+            $ucfSuffix = ucfirst($filterColumn);
+            foreach(config("enums.item{$ucfSuffix}") as $filter)
+            {
+                if(!$request->input("filter") || $request->input("{$filterColumn}_{$filter}"))
+                {
+                    array_push($activeFilters["{$filterColumn}"], "{$filter}");
+                }
+            }
+        }
+
+
+        //$items = collect();
+        //$activeFilters = [];
+        //if($request->input("filter"))
+        //{
+        //    foreach(config('enums.itemCategory') as $category)
+        //    {
+        //        if($request->input("{$category}"))
+        //        {
+        //            array_push($activeFilters, $category);
+        //            $itemsToAdd = Item::where('category', "{$category}")->get();
+        //            $items = $items->merge($itemsToAdd);
+        //        }
+        //    }
+        //}
+        //else
+        //{
+        //    $items = Item::all();
+        //}
+        return view('items.index', compact('items', 'activeFilters', 'searchString'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         Gate::authorize('itemCreate');
         return view('items.create');
     }
 
-    /**
-    * Store a newly created resource in storage.
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @return \Illuminate\Http\Response
-    */
-    public function store(Request $request)
+    public function store(ItemCreateRequest $request)
     {
-        if(Gate::denies('itemCreate'))
-        {
-            return back()->withErrors(['Missing a required permission to create item']);
-        }
-        // form validation
-        $item = $this->validate(request(), [
-            'found_time' => 'required|date',
-            'found_location' => 'required',
-            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:500',
-        ]);
-        //Handles the uploading of the image
-        if ($request->hasFile('image'))
-        {
-            //Gets the filename with the extension
-            $fileNameWithExt = $request->file('image')->getClientOriginalName();
-            //just gets the filename
-            $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-            //Just gets the extension
-            $extension = $request->file('image')->getClientOriginalExtension();
-            //Gets thefilename to store
-            $fileNameToStore = $filename.'_'.time().'.'.$extension;
-            //Uploads the image
-            $path =$request->file('image')->storeAs('public/images', $fileNameToStore);
-        }
-        else
-        {
-            $fileNameToStore = 'noimage.jpg';
-        }
 
         $item = new Item;
+        $item->title = $request->input('title');
         $item->category = $request->input('category');
-        $item->found_userid = auth()->user()->id;;
+        $item->found_userid = auth()->user()->id;
         $item->found_time = $request->input('found_time');
         $item->found_location = $request->input('found_location');
         $item->color = $request->input('color');
-        $item->image = $fileNameToStore;
         $item->description = $request->input('description');
         $item->created_at = now();
+
+        //Handles the uploading of the image
+        if ($request->hasFile('image'))
+        {
+            $fileNameWithExt = $request->file('image')->getClientOriginalName();
+            $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+            $extension = $request->file('image')->getClientOriginalExtension();
+            //TODO sanitise '%'
+            $fileNameToStore = $filename.'_'.time().'.'.$extension;
+
+            $path =$request->file('image')->storeAs('public/images', $fileNameToStore);
+            $item->image = $fileNameToStore;
+        }
 
 
         $item->save();
@@ -84,12 +112,6 @@ class ItemController extends Controller
         return back()->with('success', 'Item has been added');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         $item = Item::find($id);
@@ -101,73 +123,52 @@ class ItemController extends Controller
         return view('items.show',compact('item'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit(int $id)
     {
         $item = Item::find($id);
         Gate::authorize('itemEdit', $item);
+        if(!$item)
+        {
+            $label = $itemRequestId ? $itemRequestId : 'null';
+            abort(400, "Cannot process request: Item \"{$label}\" was not found");
+        }
         return view('items.edit', compact('item'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function update(ItemUpdateRequest $request, $id)
     {
-
         $item = Item::find($id);
-        if(Gate::denies('itemEdit', $item))
+        if(!$item)
         {
-            return back()->withErrors(['Missing a required permission to edit this item']);
+            $label = $id ? $id : 'null';
+            abort(400, "Cannot process request: Item \"{$label}\" was not found");
         }
-        $this->validate(request(), [
-            'found_location' => 'required',
-            'found_time' =>'required'
-        ]);
+
+        $item->title = $request->input('title');
         $item->category = $request->input('category');
         $item->found_time = $request->input('found_time');
         $item->found_location = $request->input('found_location');
         $item->color = $request->input('color');
         $item->description = $request->input('description');
         $item->updated_at = now();
+
         //Handles the uploading of the image
         if ($request->hasFile('image'))
         {
-            //Gets the filename with the extension
             $fileNameWithExt = $request->file('image')->getClientOriginalName();
-            //just gets the filename
             $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-            //Just gets the extension
             $extension = $request->file('image')->getClientOriginalExtension();
-            //Gets the filename to store
+            //TODO sanitise '%'
             $fileNameToStore = $filename.'_'.time().'.'.$extension;
-            //Uploads the image
+
             $path = $request->file('image')->storeAs('public/images', $fileNameToStore);
+            $item->image = $fileNameToStore;
         }
-        else
-        {
-            $fileNameToStore = 'noimage.jpg';
-        }
-        $item->image = $fileNameToStore;
+
         $item->save();
-        return redirect('items')->with('success','Item has been updated');
+        return redirect()->back()->with('success','Item has been updated');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $item = Item::find($id);
