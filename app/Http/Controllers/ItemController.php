@@ -144,6 +144,21 @@ class ItemController extends Controller
 
         $images = "";
         $counter = 0;
+        if($item['image'])
+        {
+            foreach(explode('|', $item['image']) as $image)
+            {
+                if($request->input("previousImage{$counter}"))
+                {
+                    $fileNameToStore = $request->input("previousImage{$counter}");
+                    $images = "{$images}{$fileNameToStore}|";
+                }
+
+                $counter++;
+            }
+        }
+
+        $counter = 0;
         while($request->hasFile("image{$counter}"))
         {
             $fileNameWithExt = $request->file("image{$counter}")->getClientOriginalName();

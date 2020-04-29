@@ -5,35 +5,7 @@
 @section('content')
 
 <!--image input script -->
-<script>
-var counter = -1;
-
-document.body.onload = function() {
-        addImageInput()
-    };
-
-function addImageInput()
-{
-    counter++
-    var id = `image${counter.toString()}`
-
-    var newInput = document.createElement("input");
-    newInput.setAttribute("id", id);
-    newInput.setAttribute("type", "file");
-    newInput.setAttribute("name", id);
-    newInput.setAttribute("placeholder", "Image file");
-    newInput.setAttribute("onChange", "checkAddImageInputEnabled()");
-
-    document.getElementById('image-upload').appendChild(newInput);
-
-    checkAddImageInputEnabled();
-}
-
-function checkAddImageInputEnabled()
-{
-    document.getElementById('add-input-button').disabled = document.getElementById(`image${counter.toString()}`).files.length == 0;
-}
-</script>
+<script src="{{ asset('js/imageInputElementCreator.js') }}"></script>
 
 <div class="container">
     <div class="row justify-content-center">
@@ -101,9 +73,6 @@ function checkAddImageInputEnabled()
                                 <div class="col-md-12">
                                     <input id="add-input-button" style="height:2em;width:2em;" type="button" value="+" onclick="addImageInput()">
                                 </div>
-                            </div>
-                            <div class="row col-md-12">
-
                             </div>
                         </div>
                         <div class="col-md-7 col-md-offset-4">
