@@ -150,17 +150,20 @@ class ItemController extends Controller
             {
                 if($request->input("previousImage{$counter}"))
                 {
-                    $fileNameToStore = $request->input("previousImage{$counter}");
-                    $images = "{$images}{$fileNameToStore}|";
+                    $images = "{$images}{$image}|";
                 }
 
                 $counter++;
             }
         }
 
+
         $counter = 0;
         while($request->hasFile("image{$counter}"))
         {
+            $request->validate(["image{$counter}" => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:1024',]);
+
+
             $fileNameWithExt = $request->file("image{$counter}")->getClientOriginalName();
             $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
             $extension = $request->file("image{$counter}")->getClientOriginalExtension();

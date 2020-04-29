@@ -32,7 +32,6 @@ class ItemUpdateRequest extends FormRequest
             'found_location' => 'required|max:128',
             'color' => Rule::in(config('enums.itemColor')),
             'description' => 'sometimes|max:512',
-            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:1024',
         ];
     }
 }

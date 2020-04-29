@@ -68,11 +68,8 @@
                                 <textarea class="col-md-7" rows="4" cols="50" name="description" maxlength="256"></textarea>
                             </div>
                             <div class="row col-md-10">
-                                <label class="col-md-5">Image</label>
+                                <label class="col-md-5">Image(s)</label>
                                 <div id="image-upload" class="col-md-7"></div>
-                                <div class="col-md-12">
-                                    <input id="add-input-button" style="height:2em;width:2em;" type="button" value="+" onclick="addImageInput()">
-                                </div>
                             </div>
                         </div>
                         <div class="col-md-7 col-md-offset-4">

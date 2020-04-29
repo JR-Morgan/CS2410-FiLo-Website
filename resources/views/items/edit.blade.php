@@ -81,7 +81,6 @@
                                             <input type="button" value="Remove" onclick="removeElementById('previousImage{{$counter}}')" style="height: 2em;" />
                                             <a href="{{asset('storage/images/'.$image)}}" target="_blank">{{{$image}}}</a>
                                             <input type="hidden" name="previousImage{{$counter}}" value={{$image}}>
-
                                         </li>
                                         <?php $counter++ ?>
                                         @endforeach
@@ -93,9 +92,6 @@
                             <div class="row col-md-10">
                                 <label class="col-md-5">Add New Images</label>
                                 <div id="image-upload" class="col-md-7"></div>
-                                <div class="col-md-12">
-                                    <input id="add-input-button" style="height:2em;width:2em;" type="button" value="+" onclick="addImageInput()">
-                                </div>
                             </div>
                         </div>
                         <div class="col-md-12 col-md-offset-4">
