@@ -52,25 +52,6 @@ class ItemController extends Controller
             }
         }
 
-
-        //$items = collect();
-        //$activeFilters = [];
-        //if($request->input("filter"))
-        //{
-        //    foreach(config('enums.itemCategory') as $category)
-        //    {
-        //        if($request->input("{$category}"))
-        //        {
-        //            array_push($activeFilters, $category);
-        //            $itemsToAdd = Item::where('category', "{$category}")->get();
-        //            $items = $items->merge($itemsToAdd);
-        //        }
-        //    }
-        //}
-        //else
-        //{
-        //    $items = Item::all();
-        //}
         return view('items.index', compact('items', 'activeFilters', 'searchString'));
     }
 
@@ -82,7 +63,6 @@ class ItemController extends Controller
 
     public function store(ItemCreateRequest $request)
     {
-
         $item = new Item;
         $item->title = $request->input('title');
         $item->category = $request->input('category');
@@ -93,19 +73,26 @@ class ItemController extends Controller
         $item->description = $request->input('description');
         $item->created_at = now();
 
-        //Handles the uploading of the image
-        if ($request->hasFile('image'))
+
+        $images = "";
+        $counter = 0;
+        while($request->hasFile("image{$counter}"))
         {
-            $fileNameWithExt = $request->file('image')->getClientOriginalName();
+            $fileNameWithExt = $request->file("image{$counter}")->getClientOriginalName();
             $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-            $extension = $request->file('image')->getClientOriginalExtension();
+            $extension = $request->file("image{$counter}")->getClientOriginalExtension();
             //TODO sanitise '%'
             $fileNameToStore = $filename.'_'.time().'.'.$extension;
 
-            $path =$request->file('image')->storeAs('public/images', $fileNameToStore);
-            $item->image = $fileNameToStore;
-        }
+            $path = $request->file("image{$counter}")->storeAs('public/images', $fileNameToStore);
+            $images = "{$images}{$fileNameToStore}|";
 
+            $counter++;
+        }
+        //Removes the last | from the end of the string
+        $images = substr($images, 0, -1);
+
+        $item->image = $images;
 
         $item->save();
         // generate a redirect HTTP response with a success message
@@ -126,12 +113,11 @@ class ItemController extends Controller
     public function edit(int $id)
     {
         $item = Item::find($id);
-        Gate::authorize('itemEdit', $item);
         if(!$item)
         {
-            $label = $itemRequestId ? $itemRequestId : 'null';
-            abort(400, "Cannot process request: Item \"{$label}\" was not found");
+            abort(404);
         }
+        Gate::authorize('itemEdit', $item);
         return view('items.edit', compact('item'));
     }
 
@@ -140,8 +126,11 @@ class ItemController extends Controller
         $item = Item::find($id);
         if(!$item)
         {
-            $label = $id ? $id : 'null';
-            abort(400, "Cannot process request: Item \"{$label}\" was not found");
+            return back()->withErrors(["Cannot find item"]);
+        }
+        if(Gate::denies('itemCreate'))
+        {
+            return back()->withErrors(['Missing a required permission to edit item']);
         }
 
         $item->title = $request->input('title');
@@ -152,19 +141,28 @@ class ItemController extends Controller
         $item->description = $request->input('description');
         $item->updated_at = now();
 
-        //Handles the uploading of the image
-        if ($request->hasFile('image'))
+
+        $images = "";
+        $counter = 0;
+        while($request->hasFile("image{$counter}"))
         {
-            $fileNameWithExt = $request->file('image')->getClientOriginalName();
+            $fileNameWithExt = $request->file("image{$counter}")->getClientOriginalName();
             $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-            $extension = $request->file('image')->getClientOriginalExtension();
+            $extension = $request->file("image{$counter}")->getClientOriginalExtension();
             //TODO sanitise '%'
             $fileNameToStore = $filename.'_'.time().'.'.$extension;
 
-            $path = $request->file('image')->storeAs('public/images', $fileNameToStore);
-            $item->image = $fileNameToStore;
-        }
+            $path = $request->file("image{$counter}")->storeAs('public/images', $fileNameToStore);
+            $images = "{$images}{$fileNameToStore}|";
 
+            $counter++;
+        }
+        //Removes the last | from the end of the string
+        $images = substr($images, 0, -1);
+
+        $item->image = $images;
+
+        //Handles the uploading of the image
         $item->save();
         return redirect()->back()->with('success','Item has been updated');
     }
@@ -172,6 +170,10 @@ class ItemController extends Controller
     public function destroy($id)
     {
         $item = Item::find($id);
+        if(!$item)
+        {
+            abort(400, "Cannot process request: Item was not found");
+        }
         if(Gate::denies('itemDelete', $item))
         {
             return back()->withErrors(['Missing a required permission to delete this item']);

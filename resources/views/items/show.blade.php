@@ -33,7 +33,11 @@
                         </tr>
                         <tr>
                             <td colspan='2' >
-                                <img style="width:100%;height:100%" src="{{asset('storage/images/'.$item->image)}}">
+                                @if($item['image'])
+                                    @foreach(explode('|', $item['image']) as $image)
+                                    <img style="width:100%;height:100%" src="{{asset('storage/images/'.$image)}}">
+                                    @endforeach
+                                @endif
                             </td>
                         </tr>
                     </table>
@@ -41,16 +45,16 @@
                         <tr>
                             <td><a href="{{route('items.index')}}" class="btn btn-secondary" role="button">Back to the list</a></td>
 
-                            @can('itemRequestCreate', App\Item::find($item['id']))
+                            @can('itemRequestCreate', $item)
                                 <td><a href="{{action('ItemRequestController@create', array('itemId' => $item['id']))}}" class="btn btn-success">Request</a></td>
                             @endcan
 
-                            @can('itemEdit', App\Item::find($item['id']))
+                            @can('itemEdit', $item)
                                 <td><a href="{{action('ItemController@edit', $item['id'])}}" class="btn btn-warning">Edit</a></td>
                             @endcan
 
                             <td>
-                                @can('itemDelete', App\Item::find($item['id']))
+                                @can('itemDelete', $item)
                                     <form action="{{action('ItemController@destroy', $item['id'])}}" method="post">
                                         @csrf
                                         <input name="_method" type="hidden" value="DELETE">

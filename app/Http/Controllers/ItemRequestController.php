@@ -97,7 +97,7 @@ class ItemRequestController extends Controller
         }
         else if($itemRequest->state != 'open')
         {
-            abort(400, "Cannot process request: ItemRequest {$itemRequestId} can not be set to state \"{$state}\" as is not currently open");
+            abort(400, "Cannot process request: ItemRequest {$itemRequestId} can not be set to state \"{$state}\" as is not currently open, current state = \"{$itemRequest->state}\"");
         }
 
 
@@ -106,9 +106,11 @@ class ItemRequestController extends Controller
 
         $itemRequest->save();
 
+
         return redirect()->action('ItemRequestController@show', [$itemRequest->id]);
 
     }
+
 
     /**
     * Store a newly created resource in storage.
@@ -158,6 +160,10 @@ class ItemRequestController extends Controller
     {
         $itemRequest = ItemRequest::find($id);
         Gate::authorize('itemRequestEdit', $itemRequest);
+        if(!$itemRequest)
+        {
+            abort(400, "Cannot process request: ItemRequest was not found");
+        }
         return view('itemRequests.edit',compact('itemRequest'));
     }
 

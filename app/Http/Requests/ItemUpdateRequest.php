@@ -15,7 +15,7 @@ class ItemUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return Gate::allows('itemEdit');
+        return true;
     }
 
     /**

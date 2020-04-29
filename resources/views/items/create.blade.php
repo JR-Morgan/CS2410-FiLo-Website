@@ -12,7 +12,7 @@
                 <div class="alert alert-danger">
                     <ul>
                         @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
+                        <li>{{{ $error }}}</li>
                         @endforeach
                     </ul>
                 </div>
@@ -64,7 +64,9 @@
                             </div>
                             <div class="row col-md-10">
                                 <label class="col-md-5">Image</label>
-                                <input class="col-md-7" type="file" name="image" placeholder="Image file" />
+                                <input class="col-md-7" type="file" name="image0" placeholder="Image file" />
+                                <input class="col-md-7" type="file" name="image1" placeholder="Image file" />
+                                <input class="col-md-7" type="file" name="image2" placeholder="Image file" />
                             </div>
                         </div>
                         <div class="col-md-7 col-md-offset-4">

@@ -31,12 +31,12 @@
                         </div>
                         <div class="row col-md-10">
                             <label class="col-md-5">Category</label>
-                            <select class="col-md-7" name="category" value="{{$item['category']}}">
+                            <select class="col-md-7" name="category">
                             @foreach(config('enums.itemCategory') as $value)
                                 @if($value == $item['category'])
                                     <option value="{{$value}}" selected>{{ucfirst($value)}}</option>
                                 @else
-                                    <<option value="{{$value}}">{{ucfirst($value)}}</option>
+                                    <option value="{{$value}}">{{ucfirst($value)}}</option>
                                 @endif
 
                             @endforeach
@@ -69,7 +69,9 @@
                         <div class="row col-md-10">
                             <label class="col-md-5">Image</label>
 
-                            <input class="col-md-7" type="file" name="image" placeholder="{{$item['image']}}" />
+                            <input class="col-md-7" type="file" name="image0" placeholder="Image file" />
+                            <input class="col-md-7" type="file" name="image1" placeholder="Image file" />
+                            <input class="col-md-7" type="file" name="image2" placeholder="Image file" />
                         </div>
                         <div class="col-md-12 col-md-offset-4">
                             <a href="{{action('ItemController@show', $item['id'])}}" class="btn btn-secondary" role="button">Back to item</a>

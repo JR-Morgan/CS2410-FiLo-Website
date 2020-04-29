@@ -26,7 +26,7 @@
                     </table>
                     <table>
                         <tr>
-                            @can('itemRequestJudge', App\ItemRequest::find($itemRequest['id']))
+                            @can('itemRequestJudge', $itemRequest)
                                 <td><a href="{{action('ItemRequestController@approve', $itemRequest['id'])}}" class="btn btn-success">Approve</a></td>
                                 <td><a href="{{action('ItemRequestController@reject', $itemRequest['id'])}}" class="btn btn-danger">Reject</a></td>
                             @endcan
@@ -37,7 +37,7 @@
                             @can('itemRequestViewAll')
                                 <td><a href="{{action('ItemRequestController@index', $itemRequest['id'])}}" class="btn btn-secondary" role="button">Back to the list</a></td>
                             @endcan
-                            @can('itemRequestEdit', App\ItemRequest::find($itemRequest['id']))
+                            @can('itemRequestEdit', $itemRequest)
                                 <td><a href="{{action('ItemRequestController@edit', $itemRequest['id'])}}" class="btn btn-warning">Edit</a></td>
                             @endcan
                         </tr>
