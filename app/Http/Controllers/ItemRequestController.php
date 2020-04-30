@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\support\Facades\Mail;
+use App\Mail\ItemRequestStateChangeMail;
+use App\User;
 use App\ItemRequest;
 use App\Item;
 use Auth;
@@ -59,60 +62,6 @@ class ItemRequestController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function approve(int $itemRequestId)
-    {
-        return $this->judge($itemRequestId, 'approved');
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function reject(int $itemRequestId)
-    {
-        return $this->judge($itemRequestId, 'rejected');
-    }
-
-    /**
-     * @param Request $request
-     * @param String $state
-     * @return \Illuminate\Http\Response
-     */
-    private function judge(int $itemRequestId, String $state)
-    {
-        $itemRequest = ItemRequest::find($itemRequestId);
-        Gate::authorize('itemRequestJudge', $itemRequest);
-
-        if(!$itemRequest)
-        {
-            $label = $itemRequestId ? $itemRequestId : 'null';
-            abort(400, "Cannot process request: ItemRequest \"{$label}\" was not found");
-        }
-        else if (! in_array($state, config('enums.itemRequestStates')))
-        {
-            abort(400, "Cannot process request: The requested itemRequest state \"{$state}\" is not recognised");
-        }
-        else if($itemRequest->state != 'open')
-        {
-            abort(400, "Cannot process request: ItemRequest {$itemRequestId} can not be set to state \"{$state}\" as is not currently open, current state = \"{$itemRequest->state}\"");
-        }
-
-
-        $itemRequest->state = $state;
-        $itemRequest->updated_at = now();
-
-        $itemRequest->save();
-
-
-        return redirect()->action('ItemRequestController@show', [$itemRequest->id]);
-
-    }
-
-
-    /**
     * Store a newly created resource in storage.
     *
     * @param  \Illuminate\Http\Request  $request
@@ -151,6 +100,60 @@ class ItemRequestController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function approve(int $itemRequestId)
+    {
+        return $this->judge($itemRequestId, 'approved');
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function reject(int $itemRequestId)
+    {
+        return $this->judge($itemRequestId, 'rejected');;
+    }
+
+    /**
+     * @param Request $request
+     * @param String $state
+     * @return \Illuminate\Http\Response
+     */
+    private function judge(int $itemRequestId, String $state)
+    {
+        $itemRequest = ItemRequest::find($itemRequestId);
+        Gate::authorize('itemRequestJudge', $itemRequest);
+
+        if(!$itemRequest)
+        {
+            $label = $itemRequestId ? $itemRequestId : 'null';
+            abort(400, "Cannot process request: ItemRequest \"{$label}\" was not found");
+        }
+        else if (! in_array($state, config('enums.itemRequestStates')))
+        {
+            abort(400, "Cannot process request: The requested itemRequest state \"{$state}\" is not recognised");
+        }
+        else if($itemRequest->state != 'open')
+        {
+            abort(400, "Cannot process request: ItemRequest {$itemRequestId} can not be set to state \"{$state}\" as is not currently open, current state = \"{$itemRequest->state}\"");
+        }
+
+        $itemRequest->state = $state;
+        $itemRequest->updated_at = now();
+
+        $claim_user = User::find($itemRequest->claim_userid);
+        $itemRequest->save();
+        Mail::to($claim_user->email)->send(new ItemRequestStateChangeMail($claim_user->name, $itemRequest->state, $itemRequest->id));
+
+
+        return redirect()->action('ItemRequestController@show', [$itemRequest->id]);
+
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -164,7 +167,7 @@ class ItemRequestController extends Controller
         {
             abort(400, "Cannot process request: ItemRequest was not found");
         }
-        return view('itemRequests.edit',compact('itemRequest'));
+        return view('itemRequests.edit', compact('itemRequest'));
     }
 
     /**
