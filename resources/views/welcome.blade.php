@@ -85,7 +85,7 @@
                 </div>
 
                 <div class="links">
-                    <a href="/items">Search for an item</a>
+                    <a href="{{action('ItemController@index')}}">Search for an item</a>
                 </div>
             </div>
         </div>
