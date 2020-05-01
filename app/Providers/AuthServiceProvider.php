@@ -58,13 +58,18 @@ class AuthServiceProvider extends ServiceProvider
         });
         Gate::define('itemDelete', function (User $user, Item $item)
         {
-            return $item['found_userid'] == $user['id'];
+            return $item['found_userid'] == $user['id']
+                && $item['state']  == 'open';
+        });
+        Gate::define('itemClose', function (User $user)
+        {
+            return false;
         });
 
         //Requests
         Gate::define('itemRequestDelete', function (User $user, ItemRequest $itemRequest)
         {
-            return $item['userid'] == $user->id;
+            return $itemRequest['userid'] == $user->id;
         });
         Gate::define('itemRequestShow', function (User $user, ItemRequest $itemRequest)
         {
@@ -76,7 +81,9 @@ class AuthServiceProvider extends ServiceProvider
         });
         Gate::define('itemRequestCreate', function (User $user, Item $item)
         {
-            return $user && $item['found_userid'] != $user['id'];
+            return $user
+                && $item['found_userid'] != $user['id']
+                && $item['state']  == 'open';
         });
         Gate::define('itemRequestViewAll', function (User $user)
         {

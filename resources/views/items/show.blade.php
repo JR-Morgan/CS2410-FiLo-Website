@@ -12,6 +12,10 @@
                             <td>{{ucfirst($item->title)}}</td>
                         </tr>
                         <tr>
+                            <th>Status</th>
+                            <td>{{ucfirst($item->state)}}</td>
+                        </tr>
+                        <tr>
                             <th>Item category</th>
                             <td>{{ucfirst($item->category)}}</td>
                         </tr>
@@ -29,7 +33,7 @@
                         </tr>
                         <tr>
                             <th>Notes</th>
-                            <td style="max-width:150px;" >{{$item->description}}</td>
+                            <td style="max-width:150px;">{{$item->description}}</td>
                         </tr>
                         <tr>
                             <td colspan='2' >

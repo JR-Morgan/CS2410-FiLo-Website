@@ -22,10 +22,9 @@ class CreateItemsTable extends Migration
             $table->string('found_location', 128);
             $table->enum('color', config('enums.itemColor'));
             $table->string('image', 256)->nullable();
-            //$table->enum('state' config('enums.itemState'))->default('open');
+            $table->enum('state', config('enums.itemState'))->default('open');
             $table->string('description', 512)->nullable();
             $table->timestamps();
-
         });
     }
 

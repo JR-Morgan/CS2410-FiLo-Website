@@ -17,7 +17,7 @@ class CreateItemRequestsTable extends Migration
             $table->id();
             $table->timestamps();
             $table->string('message', 512)->nullable();
-            $table->enum('state', config('enums.itemRequestStates'))->default('open');
+            $table->enum('state', config('enums.itemRequestState'))->default('open');
             $table->foreignId('item_id')->constrained('items');
             $table->foreignId('claim_userid')->constrained('users');
         });

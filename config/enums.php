@@ -26,7 +26,14 @@ return
         'jewellery',
     ],
 
-    'itemRequestStates' =>
+    'itemState' =>
+    [
+        'open',
+        'closed',
+        'deleted',
+    ],
+
+    'itemRequestState' =>
     [
         'open',
         'approved',

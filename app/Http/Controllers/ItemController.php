@@ -180,9 +180,21 @@ class ItemController extends Controller
 
         $item->image = $images;
 
-        //Handles the uploading of the image
         $item->save();
         return redirect()->back()->with('success','Item has been updated');
+    }
+
+    public function close($itemId, $closingItemRequestId)
+    {
+        $item = Item::find($id);
+        if(!$item)
+        {
+            abort(404);
+        }
+        Gate::authorize('itemClose', $item);
+
+        $item->state = 'closed';
+        $item->save();
     }
 
     public function destroy($id)
@@ -196,7 +208,9 @@ class ItemController extends Controller
         {
             return back()->withErrors(['Missing a required permission to delete this item']);
         }
-        $item->delete();
+        //$item->delete();
+        $item->state = 'deleted';
+        $item->save();
         return redirect('items')->with('success','Item has been deleted');
     }
 }

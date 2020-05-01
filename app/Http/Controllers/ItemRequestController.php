@@ -127,25 +127,37 @@ class ItemRequestController extends Controller
         $itemRequest = ItemRequest::find($itemRequestId);
         Gate::authorize('itemRequestJudge', $itemRequest);
 
+
         if(!$itemRequest)
         {
             $label = $itemRequestId ? $itemRequestId : 'null';
             abort(400, "Cannot process request: ItemRequest \"{$label}\" was not found");
         }
-        else if (! in_array($state, config('enums.itemRequestStates')))
+        if (! in_array($state, config('enums.itemRequestState')))
         {
-            abort(400, "Cannot process request: The requested itemRequest state \"{$state}\" is not recognised");
+            abort(400, "Cannot process request: The requested itemRequest state is not recognised");
         }
-        else if($itemRequest->state != 'open')
+        if($itemRequest->state != 'open')
         {
-            abort(400, "Cannot process request: ItemRequest {$itemRequestId} can not be set to state \"{$state}\" as is not currently open, current state = \"{$itemRequest->state}\"");
+            abort(400, "Cannot process request: ItemRequest {$itemRequestId} can not be judged as is not currently open, current item request state = \"{$itemRequest->state}\"");
+        }
+        $item = Item::find($itemRequest->item_id);
+        if($item->state != 'open')
+        {
+            abort(400, "Cannot process request: The Item {$item->id} is not currently open, current item state = \"{$item->state}\"");
         }
 
         $itemRequest->state = $state;
         $itemRequest->updated_at = now();
+        $itemRequest->save();
+
+        if($itemRequest->state == 'open')
+        {
+            ItemController.close($itemRequest->$item_id);
+        }
 
         $claim_user = User::find($itemRequest->claim_userid);
-        $itemRequest->save();
+
         Mail::to($claim_user->email)->send(new ItemRequestStateChangeMail($claim_user->name, $itemRequest->state, $itemRequest->id));
 
 
