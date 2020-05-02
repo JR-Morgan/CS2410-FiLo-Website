@@ -76,8 +76,8 @@ class ItemController extends Controller
 
         $images = "";
         $counter = 0;
-        while($request->hasFile("image{$counter}"))
-        {
+        while($request->hasFile("image{$counter}")) {
+            $request->validate(["image{$counter}" => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:1024',]);
             $fileNameWithExt = $request->file("image{$counter}")->getClientOriginalName();
             $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
             $extension = $request->file("image{$counter}")->getClientOriginalExtension();
