@@ -13,6 +13,11 @@ use Gate;
 class ItemController extends Controller
 {
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         $items = collect();
@@ -20,6 +25,7 @@ class ItemController extends Controller
         $filterColumns = ['category', 'color'];
         $searchString = $request->input("searchString");
 
+        //Filter results
         foreach($allItems as $item)
         {
             $passesFilter = true;
@@ -38,6 +44,7 @@ class ItemController extends Controller
             }
         }
 
+        //Compile currently active results
         $activeFilters = array();
         foreach($filterColumns as $filterColumn)
         {
@@ -55,12 +62,23 @@ class ItemController extends Controller
         return view('items.index', compact('items', 'activeFilters', 'searchString'));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function create()
     {
         Gate::authorize('itemCreate');
         return view('items.create');
     }
 
+    /**
+    * Store a newly created resource in storage.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\Response
+    */
     public function store(ItemCreateRequest $request)
     {
         $item = new Item;
@@ -76,7 +94,8 @@ class ItemController extends Controller
 
         $images = "";
         $counter = 0;
-        while($request->hasFile("image{$counter}")) {
+        while($request->hasFile("image{$counter}"))
+        {
             $request->validate(["image{$counter}" => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:1024',]);
             $fileNameWithExt = $request->file("image{$counter}")->getClientOriginalName();
             $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
@@ -99,6 +118,12 @@ class ItemController extends Controller
         return back()->with('success', 'Item has been added');
     }
 
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function show($id)
     {
         $item = Item::find($id);
@@ -110,6 +135,12 @@ class ItemController extends Controller
         return view('items.show',compact('item'));
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function edit(int $id)
     {
         $item = Item::find($id);
@@ -184,25 +215,43 @@ class ItemController extends Controller
         return redirect()->back()->with('success','Item has been updated');
     }
 
-    public function close($itemId, $closingItemRequestId)
+    /**
+     * Sets the state of an item to closed.
+     *
+     * @param  int  $itemId
+     * @param  int  $closingItemRequestId
+     * @return void
+     */
+    public function close(int $itemId, int $closingItemRequestId)
     {
         $item = Item::find($id);
         if(!$item)
         {
-            abort(404);
+            return back()->withErrors(["Cannot process request: Item was not found"]);
         }
-        Gate::authorize('itemClose', $item);
+        if(Gate::denies('itemClose', $item))
+        {
+            return back()->withErrors(['Missing a required permission to delete this item']);
+        }
 
         $item->state = 'closed';
         $item->save();
+        return redirect('items')->with('success','Item state has been updated');
     }
 
+    /**
+     * Sets the state of an item to deleted.
+     *
+     * @param  int  $itemId
+     * @param  int  $closingItemRequestId
+     * @return void
+     */
     public function destroy($id)
     {
         $item = Item::find($id);
         if(!$item)
         {
-            abort(400, "Cannot process request: Item was not found");
+            return back()->withErrors(["Cannot process request: Item was not found"]);
         }
         if(Gate::denies('itemDelete', $item))
         {
@@ -211,6 +260,6 @@ class ItemController extends Controller
         //$item->delete();
         $item->state = 'deleted';
         $item->save();
-        return redirect('items')->with('success','Item has been deleted');
+        return redirect('items')->with('success','Item state has been updated');
     }
 }

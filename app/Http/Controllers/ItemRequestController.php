@@ -214,9 +214,13 @@ class ItemRequestController extends Controller
     public function destroy($id)
     {
         $itemRequest = ItemRequest::find($id);
+        if(!$itemRequest)
+        {
+            return back()->withErrors(["Cannot process request: Specified ItemRequest was not found"]);
+        }
         if(Gate::denies('requestDelete', $itemRequest))
         {
-            return back()->withErrors(['Missing a required permission to delete this item request']);
+            return back()->withErrors(['Missing a required permission to delete this ItemRequest']);
         }
         $itemRequest->delete();
         return redirect('itemrequests')->with('success','Request has been deleted');

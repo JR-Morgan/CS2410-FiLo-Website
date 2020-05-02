@@ -27,8 +27,14 @@
                     <table>
                         <tr>
                             @can('itemRequestJudge', $itemRequest)
-                                <td><a href="{{action('ItemRequestController@approve', $itemRequest['id'])}}" class="btn btn-success">Approve</a></td>
-                                <td><a href="{{action('ItemRequestController@reject', $itemRequest['id'])}}" class="btn btn-danger">Reject</a></td>
+                                <td><form action="{{action('ItemRequestController@reject', $itemRequest['id'])}}" method="patch">
+                                    @csrf
+                                    <button class="btn btn-danger" type="submit">Reject</button>
+                                </form></td>
+                                <td><form action="{{action('ItemRequestController@approve', $itemRequest['id'])}}" method="patch">
+                                    @csrf
+                                    <button class="btn btn-success" type="submit">Approve</button>
+                                </form></td>
                             @endcan
                         </tr>
                     </table>
