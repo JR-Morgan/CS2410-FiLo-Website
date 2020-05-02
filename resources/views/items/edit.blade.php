@@ -79,7 +79,7 @@
                                         @foreach(explode('|', $item['image']) as $image)
                                         <li id="previousImage{{$counter}}">
                                             <input type="button" value="Remove" onclick="removeElementById('previousImage{{$counter}}')" style="height: 2em;" />
-                                            <a href="{{asset('storage/images/'.$image)}}" target="_blank">{{{$image}}}</a>
+                                            <a href="{{asset('storage/images/'.$image)}}" target="_blank">{{$image}}</a>
                                             <input type="hidden" name="previousImage{{$counter}}" value={{$image}}>
                                         </li>
                                         <?php $counter++ ?>

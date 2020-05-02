@@ -43,7 +43,7 @@
                                 <label class="col-md-5">Category</label>
                                 <select class="col-md-7" name="category">
                                 @foreach(config('enums.itemCategory') as $value)
-                                    <option value="{{$value}}">{{ucfirst($value)}}</option>
+                                    <option value="{{$value}}">{{{ucfirst($value)}}}</option>
                                 @endforeach
                                 </select>
                             </div>
