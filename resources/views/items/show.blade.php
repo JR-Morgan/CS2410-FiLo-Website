@@ -39,7 +39,7 @@
                             <td colspan='2' >
                                 @if($item['image'])
                                     @foreach(explode('|', $item['image']) as $image)
-                                    <img style="width:100%;height:100%" src="{{asset('storage/images/'.$image)}}">
+                                    <img style="width:100%;" src="{{asset('storage/images/'.$image)}}">
                                     @endforeach
                                 @endif
                             </td>
